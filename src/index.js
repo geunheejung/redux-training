@@ -1,63 +1,134 @@
 import React from 'react';
+import { createStore } from 'redux';
 import ReactDOM from 'react-dom';
-// import { createStore } from 'redux';
-import App from './App';
 import reducer from './rootReducers';
+import Counter from './Counter';
+import expect from 'expect';
+import deepFreeze from 'deep-freeze';
 
-const con = (str) => {
-  console.group('console');
-  console.log(str);
-  console.groupEnd();
+const addCounter = (list) => {
+  // list.push(0);
+  // return list.concat([0]);
+  return [...list, 0];
 }
 
-const createStore = reducer => {
-  let state;
-  let listeners = [];
+const testAddCounter = () => {
+  const listBefore = [];
+  const listAfter = [0];
 
-  const getState = () => state;
+  deepFreeze(listBefore);
 
-  const dispatch = (action) => {
-    // 플레인 오브젝트인 액션을 받아서 reducer에게 전달해주고 그 reducer의 반환값을 전체 상태에 반영한 이후
-    state = reducer(state, action);
-    // 현재 등록된 리스너들을 호출함으로써 상태 변화를 알린다.
-    listeners.forEach(listener => {
-      listener()
-    });
-  };
+  expect(
+    addCounter(listBefore)
+  ).toEqual(listAfter);
+};
 
-  const subscribe = (listener) => {
-    // 인자로 스토어의 상태가 변화한 이후의 콜백 함수를 받는다.
-    listeners.push(listener);
-    // 함수를 반환한 이유는 사용자에게 리스너를 취소할 수 있게 하기 위해서이다.
+testAddCounter();
+console.log('All tests passed');
 
-    return () => {
-      listeners = listeners.filter(l => l !== listener);
-    }
-  };
-
-  dispatch({});
-  return { getState, dispatch, subscribe };
+const removeCounter = (list, index) => {
+  // list.splice(index, 1);
+  // return list;
+  console.log(index);
+  console.log(list.slice(0,index));
+  console.log(list.slice(index + 1));
+  // return list.slice(0, index).concat(list.slice(index + 1));
+  return [
+    ...list.slice(0, index),
+    ...list.slice(index + 1)
+  ]
 }
+
+const testRemoveCounter = () => {
+  const listBefore = [0, 10, 20];
+  const listAfter = [0, 20];
+
+  deepFreeze(listBefore);
+
+  expect(
+    removeCounter(listBefore, 1)
+  ).toEqual(listAfter);
+};
+testRemoveCounter();
+console.log('removeArr Test passed');
+
+const incrementCounter = (list, index) => {
+  // list[index]++;
+  // return list;
+
+  console.log(list.slice(index, 1));
+  return [
+    ...list.slice(0, index),
+    list[index] + 1,
+    ...list.slice(index + 1)
+  ]
+
+};
+
+const testIncrementCounter = () => {
+  const listBefore = [0, 10, 20];
+  const listAfter = [0, 11, 20];
+
+  deepFreeze(listBefore);
+
+  expect(
+    incrementCounter(listBefore, 1)
+  ).toEqual(listAfter);
+}
+testIncrementCounter();
 
 const store = createStore(reducer);
 
 const render = () => {
-  con(store.getState());
-  document.body.innerHTML = "<div>" + store.getState() + "</div>";
+  ReactDOM.render(
+    <Counter
+      value={store.getState()}
+      onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
+      onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
+    />,
+    document.getElementById('root')
+  );
 }
 
 store.subscribe(render);
 
-document.addEventListener('click', () => {
-  store.dispatch({ type: 'INCREMENT' });
-})
+render();
 
-ReactDOM.render(
-  <App
-    store={store}
-  />,
-  document.getElementById('root')
-);
+// ReactDOM.render(
+//   <App />,
+//   document.getElementById('root')
+// );
+
+
+// TODO Redux createStore 구현
+// const createStore = reducer => {
+//   let state;
+//   let listeners = [];
+//
+//   const getState = () => state;
+//
+//   const dispatch = (action) => {
+//     // 플레인 오브젝트인 액션을 받아서 reducer에게 전달해주고 그 reducer의 반환값을 전체 상태에 반영한 이후
+//     state = reducer(state, action);
+//     // 현재 등록된 리스너들을 호출함으로써 상태 변화를 알린다.
+//     listeners.forEach(listener => {
+//       listener()
+//     });
+//   };
+//
+//   const subscribe = (listener) => {
+//     // 인자로 스토어의 상태가 변화한 이후의 콜백 함수를 받는다.
+//     listeners.push(listener);
+//     // 함수를 반환한 이유는 사용자에게 리스너를 취소할 수 있게 하기 위해서이다.
+//
+//     return () => {
+//       listeners = listeners.filter(l => l !== listener);
+//     }
+//   };
+//
+//   dispatch({});
+//   return { getState, dispatch, subscribe };
+// }
 
 // TODO counter Reducer Test Code
 /*

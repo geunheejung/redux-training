@@ -1,13 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class App extends Component {
-  render() {
-    return (
-      <div>
+export default ({ value, onIncrement, onDecrement }) => {
+  return (
+    <div>
 
-      </div>
-    );
-  }
+    </div>
+  );
 }
 
-export default App;
