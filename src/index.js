@@ -5,6 +5,7 @@ import reducer from './rootReducers';
 import Counter from './Counter';
 import expect from 'expect';
 import deepFreeze from 'deep-freeze';
+import App from './App';
 
 const todo = (state, action) => {
   switch (action.type) {
@@ -42,6 +43,93 @@ const todos = (state = [], action) => {
   }
 };
 
+const visibilityFilter = (state = 'SHOW_ALL', action) => {
+  switch (action.type) {
+    case 'SET_VISIBILITY':
+      return action.filter;
+    default:
+      return state;
+  }
+};
+
+const combineReducers = (reducers) => {
+  return (state = {}, action) => {
+    console.group('ACTION');
+    console.log(action);
+    console.groupEnd();
+    console.group('STATE');
+    console.log(state);
+    console.groupEnd();
+    return Object.keys(reducers)
+      .reduce((nextState, key) => {
+        nextState[key] = reducers[key](
+          state[key],
+          action
+        );
+        return nextState;
+    }, {})
+  };
+}
+
+//TODO root Reducer 컴포지션
+/*
+const todoApp = (state = {}, action) => {
+  return {
+    todos: todos(
+      state.todos,
+      action
+    ),
+    visibilityFilter: visibilityFilter(
+      state.visibilityFilter,
+      action
+    )
+  };
+};
+*/
+
+// 위와 같음.
+const todoApp = combineReducers({
+  todos: todos,
+  visibilityFilter: visibilityFilter
+});
+
+const store = createStore(todoApp);
+
+const render = () => {
+  // TODO Counter Render
+  // ReactDOM.render(
+  //   <Counter
+  //     value={store.getState()}
+  //     onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
+  //     onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
+  //   />,
+  //   document.getElementById('root')
+  // );
+
+}
+
+store.subscribe(render);
+//
+store.dispatch({
+  type: 'ADD_TODO',
+  id: 1,
+  text: 'dd'
+})
+//
+store.dispatch({
+  type: 'ADD_TODO',
+  id: 1,
+  text: 'bb'
+})
+
+ReactDOM.render(
+  <App />,
+  document.getElementById('root')
+);
+
+
+// TODO toogle Test Code
+/*
 const testToggleTodo = () => {
   const stateBefore = [
     {
@@ -105,29 +193,7 @@ const testAddTodo = () => {
 };
 testAddTodo();
 console.log('All tests passed');
-
-const store = createStore(reducer);
-
-const render = () => {
-  ReactDOM.render(
-    <Counter
-      value={store.getState()}
-      onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
-      onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
-    />,
-    document.getElementById('root')
-  );
-}
-
-store.subscribe(render);
-
-render();
-
-// ReactDOM.render(
-//   <App />,
-//   document.getElementById('root')
-// );
-
+*/
 
 // TODO 불변 테스트 코드
 /*
