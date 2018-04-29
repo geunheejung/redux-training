@@ -6,6 +6,123 @@ import Counter from './Counter';
 import expect from 'expect';
 import deepFreeze from 'deep-freeze';
 
+const todos = (state = [], action) => {
+  switch (action.type) {
+    case 'ADD_TODO':
+      return [
+        ...state,
+        {
+          id: action.id,
+          text: action.text,
+          completed: false
+        }
+      ];
+    case 'TOGGLE_TODO':
+      const newState = state.map(( todo ) => {
+        if (todo.id !== action.id) return todo;
+
+        todo = {
+          ...todo,
+          completed: !todo.completed
+        }
+
+        return todo;
+      })
+      return [...newState]
+    default:
+      return state;
+  }
+};
+
+const testToggleTodo = () => {
+  const stateBefore = [
+    {
+      id: 0,
+      text: 'Learn Redux',
+      completed: false
+    },
+    {
+      id: 1,
+      text: 'Go shopping',
+      completed: false
+    },
+  ];
+
+  const action = {
+    type: 'TOGGLE_TODO',
+    id: 1
+  };
+
+  const stateAfter = [
+    {
+      id: 0,
+      text: 'Learn Redux',
+      completed: false
+    },
+    {
+      id: 1,
+      text: 'Go shopping',
+      completed: true
+    },
+  ]
+
+  deepFreeze(stateBefore);
+  deepFreeze(action);
+
+  expect(
+    todos(stateBefore, action)
+  ).toEqual(stateAfter);
+}
+testToggleTodo();
+
+const testAddTodo = () => {
+  const stateBefore = [];
+  const action = {
+    type: 'ADD_TODO',
+    id: 0,
+    text: 'Learn Redux'
+  };
+  const stateAfter = [{
+    id: 0,
+    text: 'Learn Redux',
+    completed: false
+  }];
+
+  deepFreeze(stateBefore);
+  deepFreeze(action);
+
+  expect(
+    todos(stateBefore, action)
+  ).toEqual(stateAfter);
+};
+testAddTodo();
+console.log('All tests passed');
+
+const store = createStore(reducer);
+
+const render = () => {
+  ReactDOM.render(
+    <Counter
+      value={store.getState()}
+      onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
+      onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
+    />,
+    document.getElementById('root')
+  );
+}
+
+store.subscribe(render);
+
+render();
+
+// ReactDOM.render(
+//   <App />,
+//   document.getElementById('root')
+// );
+
+
+// TODO 불변 테스트 코드
+/*
 const addCounter = (list) => {
   // list.push(0);
   // return list.concat([0]);
@@ -76,59 +193,39 @@ const testIncrementCounter = () => {
   ).toEqual(listAfter);
 }
 testIncrementCounter();
-
-const store = createStore(reducer);
-
-const render = () => {
-  ReactDOM.render(
-    <Counter
-      value={store.getState()}
-      onIncrement={() => store.dispatch({ type: 'INCREMENT' })}
-      onDecrement={() => store.dispatch({ type: 'DECREMENT' })}
-    />,
-    document.getElementById('root')
-  );
-}
-
-store.subscribe(render);
-
-render();
-
-// ReactDOM.render(
-//   <App />,
-//   document.getElementById('root')
-// );
-
+*/
 
 // TODO Redux createStore 구현
-// const createStore = reducer => {
-//   let state;
-//   let listeners = [];
-//
-//   const getState = () => state;
-//
-//   const dispatch = (action) => {
-//     // 플레인 오브젝트인 액션을 받아서 reducer에게 전달해주고 그 reducer의 반환값을 전체 상태에 반영한 이후
-//     state = reducer(state, action);
-//     // 현재 등록된 리스너들을 호출함으로써 상태 변화를 알린다.
-//     listeners.forEach(listener => {
-//       listener()
-//     });
-//   };
-//
-//   const subscribe = (listener) => {
-//     // 인자로 스토어의 상태가 변화한 이후의 콜백 함수를 받는다.
-//     listeners.push(listener);
-//     // 함수를 반환한 이유는 사용자에게 리스너를 취소할 수 있게 하기 위해서이다.
-//
-//     return () => {
-//       listeners = listeners.filter(l => l !== listener);
-//     }
-//   };
-//
-//   dispatch({});
-//   return { getState, dispatch, subscribe };
-// }
+/*
+const createStore = reducer => {
+  let state;
+  let listeners = [];
+
+  const getState = () => state;
+
+  const dispatch = (action) => {
+    // 플레인 오브젝트인 액션을 받아서 reducer에게 전달해주고 그 reducer의 반환값을 전체 상태에 반영한 이후
+    state = reducer(state, action);
+    // 현재 등록된 리스너들을 호출함으로써 상태 변화를 알린다.
+    listeners.forEach(listener => {
+      listener()
+    });
+  };
+
+  const subscribe = (listener) => {
+    // 인자로 스토어의 상태가 변화한 이후의 콜백 함수를 받는다.
+    listeners.push(listener);
+    // 함수를 반환한 이유는 사용자에게 리스너를 취소할 수 있게 하기 위해서이다.
+
+    return () => {
+      listeners = listeners.filter(l => l !== listener);
+    }
+  };
+
+  dispatch({});
+  return { getState, dispatch, subscribe };
+}
+*/
 
 // TODO counter Reducer Test Code
 /*
