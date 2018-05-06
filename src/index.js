@@ -1,296 +1,31 @@
-import React, { Component } from 'react';
-import { createStore, combineReducers } from 'redux';
+import React from 'react';
 import ReactDOM from 'react-dom';
+import Root from './components/Root';
+import configureStore from './configureStore';
 
-const todo = (state, action) => {
-  switch (action.type) {
-    case 'ADD_TODO':
-      return {
-        id: action.id,
-        text: action.text,
-        completed: false
-      }
-    case 'TOGGLE_TODO':
-      if (state.id !== action.id) {
-        return state;
-      }
-
-      return {
-        ...state,
-        completed: !state.completed
-      }
-    default:
-      return state;
-  }
-}
-//
-const todos = (state = [], action) => {
-  switch (action.type) {
-    case 'ADD_TODO':
-      return [
-        ...state,
-        todo(undefined, action)
-      ];
-    case 'TOGGLE_TODO':
-      return state.map((t) => todo(t, action));
-    default:
-      return state;
-  }
-};
-//
-const visibilityFilter = (state = 'SHOW_ALL', action) => {
-  switch (action.type) {
-    case 'SET_VISIBILITY':
-      return action.filter;
-    default:
-      return state;
-  }
-};
-
-//
-const getVisibleTodos = (
-  todos,
-  filter) => {
-  switch (filter) {
-    case 'SHOW_ALL':
-      return todos;
-    case 'SHOW_COMPLETED':
-      return todos.filter(
-        t => t.completed
-      );
-    case 'SHOW_ACTIVE':
-      return todos.filter(
-        t => !t.completed
-      );
-    default:
-      return todos;
-  }
-}
-//
-const Todo = ({ onClick, completed, text }) => (
-  <li
-    onClick={onClick}
-    style={{
-      textDecoration:
-        completed
-          ? 'line-through'
-          : 'none'
-    }}
-  >
-    {text}
-  </li>
-);
-
-const TodoList = ({
-  todos,
-  onTodoClick
-  }) => (
-  <ul>
-    {todos.map(todo =>
-      <Todo
-        key={todo.id}
-        {...todo}
-        onClick={() => onTodoClick(todo.id)}
-      />
-    )}
-  </ul>
-);
-
-class VisibileTodoList extends Component {
-  componentDidMount() {
-    this.unsubscribe = this.props.store.subscribe(() =>
-      this.forceUpdate()
-    );
-  }
-
-  componentWillUnmount() {
-
-    this.unsubscribe();
-  }
-
-  render() {
-    const props = this.props;
-    const state = props.store.getState();
-
-    return (
-      <TodoList
-        todos={
-          getVisibleTodos(
-            state.todos,
-            state.visibilityFilter
-          )
-        }
-        onTodoClick={id =>
-          this.props.store.dispatch({
-            type: 'TOGGLE_TODO',
-            id
-          })
-        }
-      />
-    );
-  }
-}
-
-
-const Link = ({
-  children,
-  onClick
-}) => {
-  return (
-    <a
-      href='#'
-      onClick={onClick}
-    >
-      {children}
-    </a>
-  );
-}
-
-class FilterLink extends Component {
-  componentDidMount() {
-    this.unsubscribe = this.props.store.subscribe(() =>
-      this.forceUpdate()
-    );
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  render() {
-    const props = this.props;
-    const state = props.store.getState();
-    return (
-      <Link
-        active={
-          props.filter ===
-          state.visibilityFilter
-        }
-        onClick={(e) => {
-          e.preventDefault();
-          this.props.store.dispatch({
-            type: 'SET_VISIBILITY',
-            filter: props.filter
-          })
-        }}
-      >
-        {props.children}
-      </Link>
-    );
-  }
-}
-//
-const Footer = (props) => (
-  <p>
-    Show:
-    {' '}
-    <FilterLink
-      filter='SHOW_ALL'
-      {...props}
-    >
-      All
-    </FilterLink>
-    {' '}
-    <FilterLink
-      filter='SHOW_ACTIVE'
-      {...props}
-    >
-      Active
-    </FilterLink>
-
-    {' '}
-    <FilterLink
-      filter='SHOW_COMPLETED'
-      {...props}
-    >
-      Completed
-    </FilterLink>
-
-  </p>
-);
-//
-
-const addTodoTitle = (() => {
-  let todoId = 0;
-
-  return (value) => {
-    return {
-      type: 'ADD_TODO',
-      text: value,
-      id: todoId++
-    }
-  };
-})();
-
-const AddTodo = ({ store }) => {
-  let input;
-
-  return (
-    <div>
-      <input
-        ref={node => {
-          input = node;
-        }}
-        type="text"
-      />
-      <button
-        onClick={() => {
-          store.dispatch(addTodoTitle(input.value));
-          input.value = '';
-        }}
-      >
-        Add Todo
-      </button>
-    </div>
-  )
-}
-//
-//
-const TodoApp = ({ store }) => (
-  <div>
-    <AddTodo
-      store={store}
-    />
-    <VisibileTodoList
-      store={store}
-    />
-    <Footer
-      store={store}
-    />
-  </div>
-);
-
-// 위와 같음.
-const todoApp = combineReducers({
-  todos: todos,
-  visibilityFilter: visibilityFilter
-});
+const store = configureStore();
 
 ReactDOM.render(
-  <TodoApp
-    store={createStore(todoApp)}
-  />,
+  <Root store={store} />,
   document.getElementById('root')
 );
 
 
 
+//TODO Provider 구현
+/*
+class Provider extends Component {
+  getChildContext() {
+    return {
+      store: this.props.store //props으로 받은 store를 전달해주는 역할
+    }
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  render() {
+    return this.props.children;
+  }
+}
+*/
 // // TODO toogle Test Code
 /*
 const testToggleTodo = () => {
@@ -357,7 +92,7 @@ const testAddTodo = () => {
 testAddTodo();
 console.log('All tests passed');
 */
-//
+
 // // TODO 불변 테스트 코드
 /*
 const addCounter = (list) => {
@@ -431,7 +166,7 @@ const testIncrementCounter = () => {
 }
 testIncrementCounter();
 */
-//
+
 // // TODO Redux createStore 구현
 /*
 const createStore = reducer => {
@@ -463,7 +198,7 @@ const createStore = reducer => {
   return { getState, dispatch, subscribe };
 }
 */
-//
+
 // // TODO counter Reducer Test Code
 /*
 expect(
@@ -491,7 +226,7 @@ expect(
 ).toEqual(0);
 console.log('Tests passed!');
 */
-//
+
 // TODO combineReducers 구현
 /*
 const combineReducers = (reducers) => {
