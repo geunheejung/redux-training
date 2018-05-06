@@ -1,45 +1,20 @@
 import React from 'react';
-import * as Actions from '../actions';
-import { Component } from 'react';
-import PropTypes from 'prop-types';
-import Link from '../components/Link';
+import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom';
+import App from '../App';
 
-class FilterLink extends Component {
-  componentDidMount() {
-    const { store } = this.context;
-    this.unsubscribe = store.subscribe(() =>
-      this.forceUpdate()
-    );
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  render() {
-    const props = this.props;
-    const { store } = this.context;
-    const state = store.getState();
-    return (
-      <Link
-        active={
-          props.filter ===
-          state.visibilityFilter
-        }
-        onClick={(e) => {
-          console.log(props.filter);
-          e.preventDefault();
-          store.dispatch(Actions.setVisibility(props.filter))
-        }}
-      >
-        {props.children}
-      </Link>
-    );
-  }
-}
-
-FilterLink.contextTypes = {
-  store: PropTypes.object
+const FilterLink = ({ filter, children }) => {
+  return (
+    <NavLink
+      exact
+      to={`/${filter}`}
+      activeStyle={{
+        textDecoration: 'none',
+        color: 'black',
+      }}
+    >
+      {children}
+    </NavLink>
+  );
 }
 
 export default FilterLink;

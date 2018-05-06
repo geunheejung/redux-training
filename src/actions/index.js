@@ -5,6 +5,5 @@ export const TOGGLE_TODO = 'TOGGLE_TODO';
 export const SET_VISIBILITY = 'SET_VISIBILITY';
 
 export const addTodo = (value) => ({ type: ADD_TODO, payload: value, id: uuidV4() });
-export const toggleTodo = (id) => ({ type: TOGGLE_TODO, payload: id });
-export const setVisibility = (filter) => ({ type: SET_VISIBILITY, payload: filter });
+export const toggleTodo = (id) => ({ type: TOGGLE_TODO, id });
 

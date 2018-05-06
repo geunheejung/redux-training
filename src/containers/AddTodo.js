@@ -1,8 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import * as Actions from '../actions';
-import PropTypes from 'prop-types';
 
-const AddTodo = (props, { store }) => {
+const AddTodo = ({ addTodo }) => {
   let input;
 
   return (
@@ -15,7 +15,7 @@ const AddTodo = (props, { store }) => {
       />
       <button
         onClick={() => {
-          store.dispatch(Actions.addTodo(input.value));
+          addTodo(input.value);
           input.value = '';
         }}
       >
@@ -25,8 +25,12 @@ const AddTodo = (props, { store }) => {
   )
 }
 
-AddTodo.contextTypes = {
-  store: PropTypes.object
-}
+// const mapStateToProps = (state) => null;
+const mapDispatchToProps = (dispatch) => ({
+  addTodo: (value) => dispatch(Actions.addTodo(value))
+});
 
-export default AddTodo;
+export default connect(
+  null,
+  mapDispatchToProps
+)(AddTodo);
