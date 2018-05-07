@@ -33,7 +33,7 @@ const promise = (store) => (next) => (action) => {
 
 const warpDispatchWithMiddlewares = (store, middlewares) => {
   middlewares.slice().reverse().forEach(middleware =>
-    // curry로 store.dispatch를 전달해준 이유는 인수 변경을 어렵게하기 위
+    // 커링을 이용해 store에 직접 접근해서 next middleware를 가져오는 대신 미들웨어를 호출하는 함수가 전달달 미들웨어를 선택할 수 있도록 파라미터로 보내서 다루기 어렵게 만듬
     store.dispatch = middleware(store)(store.dispatch)
   );
 }
