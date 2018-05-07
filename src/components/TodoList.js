@@ -5,7 +5,6 @@ const TodoList = ({
                     todos,
                     onTodoClick
                   }) => {
-  console.log('todos :', todos);
   return (
     <ul>
       {todos.map(todo =>
