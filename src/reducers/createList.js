@@ -2,6 +2,27 @@ import { combineReducers } from 'redux';
 import * as Actions from '../actions';
 
 const createList = (filter) => {
+  const handleToggle = (state, action) => {
+    const { result: toggleId, entities } = action.response;
+    const { completed } = entities.todos[toggleId];
+
+
+    /*
+    현재 클릭한 todo가
+      해결된 todo이면서 && active를 바라보고있는데 눌렀으면      -> active
+      해결되지 않는 todo이면서 && completed를 바라보고있으면    -> completed
+    
+     */
+
+    const shouldRemovoe = (
+      (completed && filter === 'active') ||
+      (!completed && filter === 'completed')
+    );
+    return shouldRemovoe
+      ? state.filter(id => id !== toggleId)
+      : state;
+  }
+
   const ids = (state = [], action) => {
     switch (action.type) {
       case Actions.FETCH_TODO_SUCCESS:
@@ -12,6 +33,8 @@ const createList = (filter) => {
         return filter !== 'completed'
           ? [...state, action.response.result]
           : state;
+      case Actions.TOGGLE_TODO_SUCCESS:
+        return handleToggle(state, action);
       default:
         return state;
     }
