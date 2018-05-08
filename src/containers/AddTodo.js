@@ -25,7 +25,6 @@ const AddTodo = ({ addTodo }) => {
   )
 }
 
-// const mapStateToProps = (state) => null;
 const mapDispatchToProps = (dispatch) => ({
   addTodo: (value) => dispatch(Actions.addTodo(value))
 });
