@@ -1,19 +1,23 @@
 import uuidV4 from 'uuid-v4';
 
 const fakeDatabase = {
-  todos: [{
-    id: uuidV4(),
-    text: 'geuni',
-    completed: true,
-  }, {
-    id: uuidV4(),
-    text: 'sky',
-    completed: true,
-  }, {
-    id: uuidV4(),
-    text: 'yangme',
-    completed: false,
-  }]
+  todos: [
+    {
+      id: uuidV4(),
+      text: 'geuni',
+      completed: true,
+    },
+    {
+      id: uuidV4(),
+      text: 'sky',
+      completed: true,
+    },
+    {
+      id: uuidV4(),
+      text: 'yangme',
+      completed: false,
+    }
+  ]
 };
 
 const delay = (ms) =>

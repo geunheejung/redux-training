@@ -1,13 +1,13 @@
 import { createStore, applyMiddleware } from 'redux';
 import promise from 'redux-promise';
 import { createLogger } from 'redux-logger';
-import rootReducer from './reducers/rootReducer';
+import root from './reducers';
 
 const configureStore = () => {
-  const middlewares = [promise];
-  middlewares.push(createLogger());
+  const middlewares = [promise, createLogger()];
+
   return createStore(
-    rootReducer,
+    root,
     applyMiddleware(...middlewares)
   );
 }
