@@ -95,5 +95,49 @@ Redux의 데이터가 변할 때 마다 실행되게 함.
 
 ```
 
+#### 4강
+
+root 파일에 store관련 코드들이 뭉쳐져있던것들을 store는 store대로 Root 컴포넌트는 Root 컴포넌트대로 분리함.
+
+##### index.js Before
+```
+    const persistedState = loadState()
+    const store = createStore(
+      todoApp,
+      persistedState
+    );
+
+    store.subscribe(throttle(() => {
+      saveState({
+        todos: store.getState().todos,
+      })
+    }, 1000))
+
+    render(
+      <Provider store={store}>
+        <App />
+      </Provider>,
+      document.getElementById('root')
+    )
+```
+
+##### index.js After
+```
+    import Root from './components/Root'
+    import configureStore from './configureStore'
+
+    const store = configureStore()
+    render(
+      <Root store={store} />,
+      document.getElementById('root')
+    );
+```
+store관련은 configureStore.js로
+루트 컴포넌트는 Root.js로
+
+이 덕에 Redux의 store가 어떻게 구성되어있는지는 프로젝트의 루트파일에서는 알필요가 없다.
+그리고 나중에 store에 대해 text code를 작성하면 원하는 대로 store 인스턴스를 쉽게 만들 수 있도록 스토어 자체를 저장하는 대신 스토어를 모듈로 빼서 사용하는것이 유용하다.
+
+[Egghead Redux Video Link]https://egghead.io/lessons/javascript-redux-refactoring-the-entry-point?series=building-react-applications-with-idiomatic-redux#/tab-transcript
 
 
